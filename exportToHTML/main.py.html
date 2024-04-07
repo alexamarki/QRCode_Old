@@ -1,0 +1,129 @@
+<html>
+<head>
+<title>main.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #9b2393; font-weight: bold;}
+.s1 { color: #000000;}
+.s2 { color: #5d6c79;}
+.s3 { color: #1c00cf;}
+.s4 { color: #c41a16;}
+.s5 { color: #aa0d91; font-weight: bold;}
+</style>
+</head>
+<body bgcolor="#ffffff">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#c0c0c0" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+main.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span>sqlite3
+<span class="s0">import </span>sys
+<span class="s0">import </span>qrcode
+
+<span class="s0">from </span>PyQt5 <span class="s0">import </span>uic, QtCore, QtGui
+<span class="s0">from </span>PyQt5.QtWidgets <span class="s0">import </span>*
+<span class="s0">from </span>PyQt5.QtGui <span class="s0">import </span>*
+<span class="s0">from </span>PyQt5.QtCore <span class="s0">import </span>*
+<span class="s2">#from PyQt5.QtWidgets import QApplication</span>
+<span class="s2">#from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem</span>
+
+<span class="s2"># Image class for QR code</span>
+<span class="s0">class </span>Image(qrcode.image.base.BaseImage):
+
+    <span class="s2"># constructor</span>
+    <span class="s0">def </span>__init__(self, border, width, box_size):
+        self.border = border
+        self.width = width
+        self.box_size = box_size
+        size = (width + border * <span class="s3">2</span>) * box_size
+        self._image = QImage(size*<span class="s3">2</span>, size, QImage.Format_RGB16)
+        
+        self._image.fill(Qt.yellow)
+
+
+    <span class="s2"># pixmap method</span>
+    <span class="s0">def </span>pixmap(self):
+        <span class="s0">return </span>QPixmap.fromImage(self._image)
+
+    <span class="s2"># drawrect method for drawing rectangle</span>
+    <span class="s0">def </span>drawrect(self, row, col):
+        painter = QPainter(self._image)
+
+        painter.fillRect(
+            (col + self.border) * self.box_size,
+            (row + self.border) * self.box_size,
+            self.box_size, self.box_size,
+            QtCore.Qt.blue)
+
+
+
+
+<span class="s0">class </span>DBSample(QMainWindow):
+    <span class="s0">def </span>__init__(self):
+        super().__init__()
+        uic.loadUi(<span class="s4">'QRencoderAlpha.ui'</span>, self)
+        self.connection = sqlite3.connect(<span class="s4">&quot;onlineProductDB.db&quot;</span>)
+        self.fileView.clicked.connect(self.select_data)
+        <span class="s2"># По умолчанию будем выводить все данные из таблицы films</span>
+        self.plainTextEdit.setPlainText(<span class="s4">&quot;&quot;&quot;SELECT productNames.id, productName, productCategory, productPrice, 
+                                        isAvailable, storeName FROM productNames INNER JOIN productPrices ON 
+                                        productNames.id == productPrices.nameID INNER JOIN productAvailability ON 
+                                        productPrices.nameID == productAvailability.nameID&quot;&quot;&quot;</span>)
+        self.select_data()
+        self.prompt.returnPressed.connect(self.handleTextEntered)
+        self.codeGenerator.clicked.connect(self.handleTextEntered)
+        self.codeGenerator_data.clicked.connect(self.dataGenPress)
+
+    <span class="s0">def </span>dataGenPress(self):
+        rowNumber = self.database.currentRow()
+        item = self.database.item(rowNumber, <span class="s3">0</span>).text()
+        query = <span class="s4">f&quot;SELECT productLink FROM productMedia WHERE productMedia.nameID == </span><span class="s5">{</span>item<span class="s5">}</span><span class="s4">&quot;</span>
+        text = self.connection.cursor().execute(query).fetchall()
+        self.handleTextEntered(text[<span class="s3">0</span>])
+
+    <span class="s0">def </span>select_data(self):
+        <span class="s2"># Получим результат запроса,</span>
+        <span class="s2"># который ввели в текстовое поле</span>
+        query = self.plainTextEdit.toPlainText()
+        res = self.connection.cursor().execute(query).fetchall()
+        <span class="s2"># Заполним размеры таблицы</span>
+        self.database.setColumnCount(<span class="s3">7</span>)
+        self.database.setRowCount(<span class="s3">0</span>)
+        <span class="s2"># Заполняем таблицу элементами</span>
+        <span class="s0">for </span>i, row <span class="s0">in </span>enumerate(res):
+            self.database.setRowCount(
+                self.database.rowCount() + <span class="s3">1</span>)
+            <span class="s0">for </span>j, elem <span class="s0">in </span>enumerate(row):
+                self.database.setItem(
+                    i, j, QTableWidgetItem(str(elem)))
+
+    <span class="s2"># method called by the line edit</span>
+    <span class="s0">def </span>handleTextEntered(self, text=<span class="s4">''</span>):
+
+        <span class="s2"># get the text</span>
+        <span class="s0">if not </span>text:
+            text = self.prompt.text()
+
+        <span class="s2"># creating a pix map of qr code</span>
+
+        qr_image = qrcode.make(text, image_factory=Image).pixmap().scaled(<span class="s3">361</span>, <span class="s3">361</span>, QtCore.Qt.KeepAspectRatio)
+
+        <span class="s2"># set image to the label</span>
+        self.label_5.setPixmap(qr_image.scaled(<span class="s3">722</span>, <span class="s3">361</span>, QtCore.Qt.KeepAspectRatio))
+
+    <span class="s0">def </span>closeEvent(self, event):
+        self.connection.close()
+
+<span class="s0">if </span>__name__ == <span class="s4">'__main__'</span>:
+    app = QApplication(sys.argv)
+    ex = DBSample()
+    ex.show()
+    sys.exit(app.exec())
+
+
+
+
+</pre>
+</body>
+</html>

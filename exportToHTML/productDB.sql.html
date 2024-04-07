@@ -1,0 +1,55 @@
+<html>
+<head>
+<title>productDB.sql</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #808080; font-style: italic;}
+.s1 { color: #000000;}
+.s2 { color: #000080; font-weight: bold;}
+.s3 { color: #0000ff;}
+.s4 { color: #008000; font-weight: bold;}
+</style>
+</head>
+<body bgcolor="#ffffff">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#c0c0c0" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+productDB.sql</font>
+</center></td></tr></table>
+<pre><span class="s0">--</span>
+<span class="s0">-- File generated with SQLiteStudio v3.3.3 on �� ��� 3 16:41:44 2022</span>
+<span class="s0">--</span>
+<span class="s0">-- Text encoding used: System</span>
+<span class="s0">--</span>
+PRAGMA foreign_keys = off;
+<span class="s2">BEGIN TRANSACTION</span>;
+
+<span class="s0">-- Table: productAvailability</span>
+<span class="s2">CREATE TABLE </span>productAvailability (id <span class="s2">INTEGER PRIMARY KEY </span>AUTOINCREMENT <span class="s2">UNIQUE NOT NULL</span>, nameID <span class="s2">INTEGER REFERENCES </span>productNames (id) <span class="s2">NOT NULL UNIQUE</span>, isAvailable BOOLEAN <span class="s2">NOT NULL</span>, storeName STRING <span class="s2">NOT NULL</span>);
+<span class="s2">INSERT INTO </span>productAvailability (id, nameID, isAvailable, storeName) <span class="s2">VALUES </span>(<span class="s3">1</span>, <span class="s3">1</span>, <span class="s3">1</span>, <span class="s4">'Perekrestok'</span>);
+<span class="s2">INSERT INTO </span>productAvailability (id, nameID, isAvailable, storeName) <span class="s2">VALUES </span>(<span class="s3">2</span>, <span class="s3">2</span>, <span class="s3">0</span>, <span class="s4">'OZON'</span>);
+<span class="s2">INSERT INTO </span>productAvailability (id, nameID, isAvailable, storeName) <span class="s2">VALUES </span>(<span class="s3">3</span>, <span class="s3">3</span>, <span class="s3">1</span>, <span class="s4">'Svyaznoy'</span>);
+
+<span class="s0">-- Table: productMedia</span>
+<span class="s2">CREATE TABLE </span>productMedia (id <span class="s2">INTEGER PRIMARY KEY </span>AUTOINCREMENT <span class="s2">UNIQUE NOT NULL</span>, nameID <span class="s2">INTEGER REFERENCES </span>productNames (id) <span class="s2">UNIQUE NOT NULL</span>, productLink STRING <span class="s2">NOT NULL UNIQUE</span>, imageLink STRING <span class="s2">UNIQUE NOT NULL</span>);
+<span class="s2">INSERT INTO </span>productMedia (id, nameID, productLink, imageLink) <span class="s2">VALUES </span>(<span class="s3">1</span>, <span class="s3">1</span>, <span class="s4">'https://www.perekrestok.ru/cat/350/p/abloki-grenni-smit-market-perekrestok-3366327'</span>, <span class="s4">'https://cdn-img.perekrestok.ru/i/1600x1600-fit/xdelivery/files/96/a5/e15a7930ca3367e23fbf4373218e.jpg'</span>);
+<span class="s2">INSERT INTO </span>productMedia (id, nameID, productLink, imageLink) <span class="s2">VALUES </span>(<span class="s3">2</span>, <span class="s3">2</span>, <span class="s4">'https://www.ozon.ru/product/titanik-3d-i-2d-4-blu-ray-250504608/?asb=QvmcAPbKqBB%252Fj%252BbcAEIxaFEMwbg0q%252B0IJ3%252F%252FKGwu%252B3w%253D&amp;asb2=S5NaNOoWc1AXTjjt60ElTY110jEbYvo8Ya7Y1hf4UOC6hwP9NUCBmXeL1y3ckK-Q&amp;avtc=1&amp;avte=2&amp;avts=1667482630&amp;keywords=%D1%82%D0%B8%D1%82%D0%B0%D0%BD%D0%B8%D0%BA+%D1%84%D0%B8%D0%BB%D1%8C%D0%BC&amp;sh=PQaGS7GIxw'</span>, <span class="s4">'https://cdn1.ozone.ru/s3/multimedia-o/wc1000/6054825756.jpg'</span>);
+<span class="s2">INSERT INTO </span>productMedia (id, nameID, productLink, imageLink) <span class="s2">VALUES </span>(<span class="s3">3</span>, <span class="s3">3</span>, <span class="s4">'https://www.svyaznoy.ru/catalog/notebook/1738/6564423'</span>, <span class="s4">'https://cdn.svyaznoy.ru/upload/iblock/b4d/macbook_pro_16-in_q122_space_gray_pdp_image_position-1__ru-ru.jpg/resize/483x483/hq/'</span>);
+
+<span class="s0">-- Table: productNames</span>
+<span class="s2">CREATE TABLE </span>productNames (id <span class="s2">INTEGER PRIMARY KEY </span>AUTOINCREMENT <span class="s2">UNIQUE NOT NULL</span>, productName STRING <span class="s2">NOT NULL</span>, productCategory STRING <span class="s2">NOT NULL</span>);
+<span class="s2">INSERT INTO </span>productNames (id, productName, productCategory) <span class="s2">VALUES </span>(<span class="s3">1</span>, <span class="s4">'������ ������ ���� ������ ����������'</span>, <span class="s4">'Fruits &amp; Vegetables'</span>);
+<span class="s2">INSERT INTO </span>productNames (id, productName, productCategory) <span class="s2">VALUES </span>(<span class="s3">2</span>, <span class="s4">'Titanic - Director''s cut'</span>, <span class="s4">'Films, Videos, Music'</span>);
+<span class="s2">INSERT INTO </span>productNames (id, productName, productCategory) <span class="s2">VALUES </span>(<span class="s3">3</span>, <span class="s4">'MBP 2021 - 16&quot;'</span>, <span class="s4">'Laptops &amp; Tablets'</span>);
+
+<span class="s0">-- Table: productPrices</span>
+<span class="s2">CREATE TABLE </span>productPrices (id <span class="s2">INTEGER PRIMARY KEY </span>AUTOINCREMENT <span class="s2">UNIQUE NOT NULL</span>, nameID <span class="s2">INTEGER REFERENCES </span>productNames (id) <span class="s2">UNIQUE NOT NULL</span>, productPrice <span class="s2">DECIMAL NOT NULL</span>);
+<span class="s2">INSERT INTO </span>productPrices (id, nameID, productPrice) <span class="s2">VALUES </span>(<span class="s3">1</span>, <span class="s3">1</span>, <span class="s4">'109,90'</span>);
+<span class="s2">INSERT INTO </span>productPrices (id, nameID, productPrice) <span class="s2">VALUES </span>(<span class="s3">2</span>, <span class="s3">2</span>, <span class="s4">'1399,00'</span>);
+<span class="s2">INSERT INTO </span>productPrices (id, nameID, productPrice) <span class="s2">VALUES </span>(<span class="s3">3</span>, <span class="s3">3</span>, <span class="s4">'374990,00'</span>);
+
+<span class="s2">COMMIT TRANSACTION</span>;
+PRAGMA foreign_keys = <span class="s2">on</span>;
+</pre>
+</body>
+</html>
